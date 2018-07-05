@@ -1,4 +1,1141 @@
 
-[{"id":"822c4617.d515b8","type":"tab","label":"Watson Assistant","disabled":false,"info":""},{"id":"b22d3195.2b913","type":"http in","z":"822c4617.d515b8","name":"","url":"/chat","method":"get","upload":false,"swaggerDoc":"","x":92.99999237060547,"y":65.9999942779541,"wires":[["344fe615.185f4a"]]},{"id":"344fe615.185f4a","type":"change","z":"822c4617.d515b8","name":"","rules":[{"t":"set","p":"payload","pt":"msg","to":"req.query.mensagem","tot":"msg"}],"action":"","property":"","from":"","to":"","reg":false,"x":156.99999237060547,"y":133.99998474121094,"wires":[["d2ea60bb.4d32c"]]},{"id":"fe6d3ab6.75e798","type":"watson-conversation-v1","z":"822c4617.d515b8","name":"","workspaceid":"d61910e9-c4fd-48cf-9546-6a0cf8d7bafa","multiuser":false,"context":true,"empty-payload":false,"default-endpoint":true,"service-endpoint":"https://gateway.watsonplatform.net/assistant/api","timeout":"","optout-learning":false,"x":460,"y":331.999981880188,"wires":[["f8683a16.7d7998"]]},{"id":"f8683a16.7d7998","type":"function","z":"822c4617.d515b8","name":"","func":"if(context.global.audio)\n{\n    node.status({fill:\"green\",shape:\"dot\",\n    text:\"Audio\"});\n\n    msg.payload = msg.payload.output.text[0];\n    context.flow.audio = false;\n    return [msg,null];   \n}\nelse\n{\n    node.status({fill:\"green\",shape:\"dot\",\n    text:\"Texto\"});\n    msg.payload = \n    [{\"text\":msg.payload.output.text[0]}];\n    return [null,msg];\n}","outputs":2,"noerr":0,"x":480,"y":400,"wires":[["97d6af5f.a773d"],["b6f2e98d.345818"]]},{"id":"b6f2e98d.345818","type":"http response","z":"822c4617.d515b8","name":"","statusCode":"","headers":{},"x":724.9999923706055,"y":209.99998569488525,"wires":[]},{"id":"90b9da68.76fbe8","type":"visual-recognition-v3","z":"822c4617.d515b8","name":"","apikey":"50f1b9ecb9e1dff4c77f8681ad3f343d3cfb85f6","vr-service-endpoint":"https://gateway-a.watsonplatform.net/visual-recognition/api","image-feature":"detectFaces","lang":"en","x":559.5113868713379,"y":137.1022548675537,"wires":[["bd340415.0b41e8","f0cd52c6.fb1d5"]]},{"id":"d2ea60bb.4d32c","type":"switch","z":"822c4617.d515b8","name":"","property":"payload","propertyType":"msg","rules":[{"t":"cont","v":"https://scontent","vt":"str"},{"t":"cont","v":"https://cdn.fbsbx.com","vt":"str"},{"t":"cont","v":"http://www.google.com/maps/place","vt":"str"},{"t":"else"}],"checkall":"false","repair":false,"outputs":4,"x":316.0142135620117,"y":226.00567436218262,"wires":[["90b9da68.76fbe8"],["6668a2f0.718b7c","d7bd308b.559e9"],[],["fe6d3ab6.75e798"]]},{"id":"bd340415.0b41e8","type":"function","z":"822c4617.d515b8","name":"","func":"var aux;\nif(msg.result.images.length > 0)\n{\n    if(msg.result.images[0].faces)\n    {\n        aux = \"Eu vejo \";\n        var tam = aux.length;\n        for(x = 0; x < msg.result.images[0].faces.length; x++)\n        {\n            \n            if(aux.length > tam)\n            {\n                aux += \"E \";\n            }\n        \n            if(msg.result.images[0].faces[x].age.min >= 55 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um senhor com idade acima de \" + msg.result.images[0].faces[x].age.min;\n            } else if(msg.result.images[0].faces[x].age.min >= 45 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um jovem senhor com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 35 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um homem com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 25 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um rapaz com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 15 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um jovem com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            }\n            aux += \" (\" + msg.result.images[0].faces[x].gender.score + \") \"\n        \n            if(msg.result.images[0].faces[x].age.min >= 55 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma senhora com idade superior à \" + msg.result.images[0].faces[x].age.min;\n            } else if(msg.result.images[0].faces[x].age.min >= 45 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma jovem senhora com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 35 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma mulher com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 25 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma garota com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 15 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma jovem com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            }\n    \n            aux += \" anos.\\n\";\n\n            if(msg.result.images[0].faces[x].identity)\n            {\n                aux += \" Parece-me ser \" + msg.result.images[0].faces[x].identity.name+ \"!\\n\"\n            }\n        }\n        msg.payload = aux;\n    }\n    else\n    {\n        msg.payload = \"Desculpe-me, mas não reconheço um rosto nesta imagem\";\n    }\n}\nelse\n{\n    msg.payload = \"Desculpe-me, mas não reconheço um rosto nesta imagem\";\n}\n\nmsg.payload = [{\"text\":msg.payload}];\nreturn msg;","outputs":1,"noerr":0,"x":522.5199165344238,"y":223.1562271118164,"wires":[["b6f2e98d.345818"]]},{"id":"f0cd52c6.fb1d5","type":"debug","z":"822c4617.d515b8","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"result","x":706.5113372802734,"y":329.16761016845703,"wires":[]},{"id":"6668a2f0.718b7c","type":"debug","z":"822c4617.d515b8","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","x":582.5198822021484,"y":508.34375762939453,"wires":[]},{"id":"a4c14b4d.3f3b08","type":"link out","z":"822c4617.d515b8","name":"OutAudio","links":["bedddf44.bc241"],"x":240.51704025268555,"y":328.7783579826355,"wires":[]},{"id":"957d3dc9.ec01c","type":"link in","z":"822c4617.d515b8","name":"InputTexto","links":["7a04981c.ac8498"],"x":240.5170440673828,"y":377.2073745727539,"wires":[["fe6d3ab6.75e798"]]},{"id":"d7bd308b.559e9","type":"change","z":"822c4617.d515b8","name":"","rules":[{"t":"set","p":"audio","pt":"global","to":"true","tot":"bool"}],"action":"","property":"","from":"","to":"","reg":false,"x":280.5170440673828,"y":283.1448745727539,"wires":[["a4c14b4d.3f3b08"]]},{"id":"97d6af5f.a773d","type":"link out","z":"822c4617.d515b8","name":"OutTexto","links":["304810fc.b531d"],"x":610.5198936462402,"y":394.42043113708496,"wires":[]},{"id":"6c4a5cb7.ecfd94","type":"link in","z":"822c4617.d515b8","name":"FaceAudio","links":["eda9bd69.7a38e"],"x":519.5085296630859,"y":268.9261245727539,"wires":[["b6f2e98d.345818"]]}]
-
-[{"id":"6c3b995c.444e28","type":"tab","label":"Audio","disabled":false,"info":""},{"id":"ef6c6936.466d98","type":"watson-speech-to-text","z":"6c3b995c.444e28","name":"","alternatives":1,"speakerlabels":false,"smartformatting":false,"lang":"pt-BR","langhidden":"","langcustom":"NoCustomisationSetting","langcustomhidden":"","band":"NarrowbandModel","bandhidden":"NarrowbandModel","password":"vCxHYSSHfS4Z","apikey":"","payload-response":true,"streaming-mode":false,"streaming-mute":false,"auto-connect":false,"discard-listening":false,"disable-precheck":false,"default-endpoint":true,"service-endpoint":"https://stream.watsonplatform.net/speech-to-text/api","x":528.0142440795898,"y":62.00564765930176,"wires":[["7a04981c.ac8498","1bf7cfd7.06cee"]]},{"id":"db2ea2cf.bc13b","type":"watson-text-to-speech","z":"6c3b995c.444e28","name":"","lang":"pt-BR","langhidden":"pt-BR","langcustom":"NoCustomisationSetting","langcustomhidden":"","voice":"pt-BR_IsabelaVoice","voicehidden":"","format":"audio/mp3","password":"jlU4eeSZ1nRG","apikey":"","payload-response":true,"default-endpoint":true,"service-endpoint":"https://stream.watsonplatform.net/text-to-speech/api","x":303.51419830322266,"y":211.96871662139893,"wires":[["112c72bd.9948cd"]]},{"id":"bedddf44.bc241","type":"link in","z":"6c3b995c.444e28","name":"InputAudio","links":["a4c14b4d.3f3b08"],"x":177.51987266540527,"y":62.196014404296875,"wires":[["19b55258.43437e"]]},{"id":"19b55258.43437e","type":"ffmpeg-conversion","z":"6c3b995c.444e28","name":"","format":"wav","audiochannels":"mono","x":323.5113830566406,"y":62.72441864013672,"wires":[["ef6c6936.466d98"]]},{"id":"7a04981c.ac8498","type":"link out","z":"6c3b995c.444e28","name":"OutTexto","links":["957d3dc9.ec01c"],"x":648.5113344192505,"y":61.32101821899414,"wires":[]},{"id":"304810fc.b531d","type":"link in","z":"6c3b995c.444e28","name":"InputTexto","links":["97d6af5f.a773d"],"x":177.51988410949707,"y":212.20737838745117,"wires":[["db2ea2cf.bc13b"]]},{"id":"f85ab2fc.d0e57","type":"http in","z":"6c3b995c.444e28","name":"","url":"/facebook/resposta","method":"get","upload":false,"swaggerDoc":"","x":130.0142059326172,"y":381.00567626953125,"wires":[["320ac5c8.3185ba"]]},{"id":"3ad95e9.dbbf5a2","type":"http response","z":"6c3b995c.444e28","name":"","statusCode":"","headers":{"content-type":"audio/mpeg3"},"x":651.0142097473145,"y":381.4342031478882,"wires":[]},{"id":"320ac5c8.3185ba","type":"change","z":"6c3b995c.444e28","name":"","rules":[{"t":"set","p":"payload","pt":"msg","to":"req.query.audioid","tot":"msg"}],"action":"","property":"","from":"","to":"","reg":false,"x":351.7284698486328,"y":381.0771017074585,"wires":[["7663acb0.515cb4"]]},{"id":"7663acb0.515cb4","type":"function","z":"6c3b995c.444e28","name":"","func":"for(var k in context.global.speech) {\n  if (context.global.speech[k]._id == msg.payload) \n    {\n      msg.payload = context.global.speech[k].speech;\n// Delete an item\n      context.global.speech.splice(k,1);\n      break;\n    } \n  }\nreturn msg;\n\n//msg.payload = Buffer.from(msg.payload.audio, 'utf8');\n//return msg;","outputs":1,"noerr":0,"x":515.1332626342773,"y":381.43421936035156,"wires":[["3ad95e9.dbbf5a2"]]},{"id":"112c72bd.9948cd","type":"function","z":"6c3b995c.444e28","name":"","func":"context.global.idAudio = context.global.idAudio || 0;\ncontext.global.idAudio = Math.floor((Math.random() * 100000000000) + 1);\n\nvar url = \"https://\" + msg.req.headers.host;\n\nif(!context.global.speech)\n{\n    context.global.speech = [];\n    context.global.speech[0] =\n    {_id:context.global.idAudio.toString(),speech:msg.payload};\n}\nelse\n{\n    var pos;\n    pos = context.global.speech.length;\n    context.global.speech[pos] =\n    {_id:context.global.idAudio.toString(),speech:msg.payload};\n}\n\nmsg.payload = [{\"attachment\":{\n    \"type\":\"audio\",\n    \"payload\":{\"url\":url+ \"/facebook/resposta?audioid=\"+context.global.idAudio.toString()}\n    }\n}];\nreturn msg;\n","outputs":1,"noerr":0,"x":458.01422119140625,"y":211.00567626953125,"wires":[["eda9bd69.7a38e"]]},{"id":"eda9bd69.7a38e","type":"link out","z":"6c3b995c.444e28","name":"OutAudio","links":["6c4a5cb7.ecfd94"],"x":586.5170154571533,"y":210.96304416656494,"wires":[]},{"id":"1bf7cfd7.06cee","type":"debug","z":"6c3b995c.444e28","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","x":581.5113372802734,"y":140.06249237060547,"wires":[]}]
+[
+    {
+      "id": "822c4617.d515b8",
+      "type": "tab",
+      "label": "Watson Assistant",
+      "disabled": false,
+      "info": ""
+    },
+    {
+      "id": "6c3b995c.444e28",
+      "type": "tab",
+      "label": "Audio",
+      "disabled": false,
+      "info": ""
+    },
+    {
+      "id": "961a4b11.d12758",
+      "type": "tab",
+      "label": "Flow 1",
+      "disabled": false,
+      "info": ""
+    },
+    {
+      "id": "869f960e.370638",
+      "type": "wml-config",
+      "z": "",
+      "host": "https://us-south.ml.cloud.ibm.com",
+      "accesskey": "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6IjZkNWJjMzYwLTJkYjgtNGM3ZS1hYzk4LTE1YTVjYTg4YjViNyIsImluc3RhbmNlSWQiOiI2ZDViYzM2MC0yZGI4LTRjN2UtYWM5OC0xNWE1Y2E4OGI1YjciLCJwbGFuSWQiOiIzZjZhY2Y0My1lZGU4LTQxM2EtYWM2OS1mOGFmM2JiMGNiZmUiLCJyZWdpb24iOiJ1cy1zb3V0aCIsInVzZXJJZCI6IjkyMGIyMDQ3LTZhM2EtNGFiZS04MDJiLWE4ZDMxNGY1OWU3NCIsImlzcyI6Imh0dHBzOi8vdXMtc291dGgubWwuY2xvdWQuaWJtLmNvbS92My9pZGVudGl0eSIsImlhdCI6MTUzMDc5Mjg1OCwiZXhwIjoxNTMwODIxNjU4fQ.cSX6SAuffdxFuECCWfH_ws4LenBWIYHu0f_CHdhhgQpV9IJrt9o-IfDt2CQ1ttjrEN9As-WYvmrSHxs8Oe1E62WQ8aT4qkuoehsVWsKyKhadnVVDohR5wooNZkFMXeRG6XMiLjkN-QS_lyeIrGvEhcu-AESse78KDlvPQIEa_FAFqCPqqYsdAZW5jdwd5CJsyLNlpvjBXJh9YdcnMVFBJ3x0Ae1mnbZnDWyfUGTr8NTvFHmbyg-9_sHD6cxNzqk3Mq2vPicHQd_iNF70IDQQ95Fq4tkDy-neRgd6djlWxN8AQvCa6fv2FWF7BLUKOZO0BD7BiyC2Q-SWBRBNgf1rtw",
+      "instanceid": "6d5bc360-2db8-4c7e-ac98-15a5ca88b5b7",
+      "name": "Initial"
+    },
+    {
+      "id": "b22d3195.2b913",
+      "type": "http in",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "url": "/chat",
+      "method": "get",
+      "upload": false,
+      "swaggerDoc": "",
+      "x": 92.99999237060547,
+      "y": 65.9999942779541,
+      "wires": [
+        [
+          "344fe615.185f4a"
+        ]
+      ]
+    },
+    {
+      "id": "344fe615.185f4a",
+      "type": "change",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "rules": [
+        {
+          "t": "set",
+          "p": "payload",
+          "pt": "msg",
+          "to": "req.query.mensagem",
+          "tot": "msg"
+        }
+      ],
+      "action": "",
+      "property": "",
+      "from": "",
+      "to": "",
+      "reg": false,
+      "x": 156.99999237060547,
+      "y": 133.99998474121094,
+      "wires": [
+        [
+          "d2ea60bb.4d32c"
+        ]
+      ]
+    },
+    {
+      "id": "fe6d3ab6.75e798",
+      "type": "watson-conversation-v1",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "workspaceid": "d61910e9-c4fd-48cf-9546-6a0cf8d7bafa",
+      "multiuser": false,
+      "context": true,
+      "empty-payload": false,
+      "default-endpoint": true,
+      "service-endpoint": "https://gateway.watsonplatform.net/assistant/api",
+      "timeout": "",
+      "optout-learning": false,
+      "x": 460,
+      "y": 331.999981880188,
+      "wires": [
+        [
+          "f8683a16.7d7998"
+        ]
+      ]
+    },
+    {
+      "id": "f8683a16.7d7998",
+      "type": "function",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "func": "if(context.global.audio)\n{\n    node.status({fill:\"green\",shape:\"dot\",\n    text:\"Audio\"});\n\n    msg.payload = msg.payload.output.text[0];\n    context.flow.audio = false;\n    return [msg,null];   \n}\nelse\n{\n    node.status({fill:\"green\",shape:\"dot\",\n    text:\"Texto\"});\n    msg.payload = \n    [{\"text\":msg.payload.output.text[0]}];\n    return [null,msg];\n}",
+      "outputs": 2,
+      "noerr": 0,
+      "x": 480,
+      "y": 400,
+      "wires": [
+        [
+          "97d6af5f.a773d"
+        ],
+        [
+          "b6f2e98d.345818"
+        ]
+      ]
+    },
+    {
+      "id": "b6f2e98d.345818",
+      "type": "http response",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "statusCode": "",
+      "headers": {},
+      "x": 724.9999923706055,
+      "y": 209.99998569488525,
+      "wires": []
+    },
+    {
+      "id": "90b9da68.76fbe8",
+      "type": "visual-recognition-v3",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "apikey": "50f1b9ecb9e1dff4c77f8681ad3f343d3cfb85f6",
+      "vr-service-endpoint": "https://gateway-a.watsonplatform.net/visual-recognition/api",
+      "image-feature": "detectFaces",
+      "lang": "en",
+      "x": 559.5113868713379,
+      "y": 137.1022548675537,
+      "wires": [
+        [
+          "bd340415.0b41e8",
+          "f0cd52c6.fb1d5"
+        ]
+      ]
+    },
+    {
+      "id": "d2ea60bb.4d32c",
+      "type": "switch",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "property": "payload",
+      "propertyType": "msg",
+      "rules": [
+        {
+          "t": "cont",
+          "v": "https://scontent",
+          "vt": "str"
+        },
+        {
+          "t": "cont",
+          "v": "https://cdn.fbsbx.com",
+          "vt": "str"
+        },
+        {
+          "t": "cont",
+          "v": "http://www.google.com/maps/place",
+          "vt": "str"
+        },
+        {
+          "t": "else"
+        }
+      ],
+      "checkall": "false",
+      "repair": false,
+      "outputs": 4,
+      "x": 316.0142135620117,
+      "y": 226.00567436218262,
+      "wires": [
+        [
+          "90b9da68.76fbe8"
+        ],
+        [
+          "6668a2f0.718b7c",
+          "d7bd308b.559e9"
+        ],
+        [],
+        [
+          "fe6d3ab6.75e798"
+        ]
+      ]
+    },
+    {
+      "id": "bd340415.0b41e8",
+      "type": "function",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "func": "var aux;\nif(msg.result.images.length > 0)\n{\n    if(msg.result.images[0].faces)\n    {\n        aux = \"Eu vejo \";\n        var tam = aux.length;\n        for(x = 0; x < msg.result.images[0].faces.length; x++)\n        {\n            \n            if(aux.length > tam)\n            {\n                aux += \"E \";\n            }\n        \n            if(msg.result.images[0].faces[x].age.min >= 55 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um senhor com idade acima de \" + msg.result.images[0].faces[x].age.min;\n            } else if(msg.result.images[0].faces[x].age.min >= 45 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um jovem senhor com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 35 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um homem com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 25 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um rapaz com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 15 && msg.result.images[0].faces[x].gender.gender == \"MALE\")\n            {\n                aux += \"um jovem com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            }\n            aux += \" (\" + msg.result.images[0].faces[x].gender.score + \") \"\n        \n            if(msg.result.images[0].faces[x].age.min >= 55 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma senhora com idade superior à \" + msg.result.images[0].faces[x].age.min;\n            } else if(msg.result.images[0].faces[x].age.min >= 45 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma jovem senhora com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 35 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma mulher com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 25 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma garota com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            } else if(msg.result.images[0].faces[x].age.min >= 15 && msg.result.images[0].faces[x].gender.gender == \"FEMALE\")\n            {\n                aux += \"uma jovem com idade entre \" + msg.result.images[0].faces[x].age.min +\n                              \" e \" + msg.result.images[0].faces[x].age.max;\n            }\n    \n            aux += \" anos.\\n\";\n\n            if(msg.result.images[0].faces[x].identity)\n            {\n                aux += \" Parece-me ser \" + msg.result.images[0].faces[x].identity.name+ \"!\\n\"\n            }\n        }\n        msg.payload = aux;\n    }\n    else\n    {\n        msg.payload = \"Desculpe-me, mas não reconheço um rosto nesta imagem\";\n    }\n}\nelse\n{\n    msg.payload = \"Desculpe-me, mas não reconheço um rosto nesta imagem\";\n}\n\nmsg.payload = [{\"text\":msg.payload}];\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 522.5199165344238,
+      "y": 223.1562271118164,
+      "wires": [
+        [
+          "b6f2e98d.345818"
+        ]
+      ]
+    },
+    {
+      "id": "f0cd52c6.fb1d5",
+      "type": "debug",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": false,
+      "complete": "result",
+      "x": 706.5113372802734,
+      "y": 329.16761016845703,
+      "wires": []
+    },
+    {
+      "id": "6668a2f0.718b7c",
+      "type": "debug",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": false,
+      "complete": "false",
+      "x": 582.5198822021484,
+      "y": 508.34375762939453,
+      "wires": []
+    },
+    {
+      "id": "ef6c6936.466d98",
+      "type": "watson-speech-to-text",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "alternatives": 1,
+      "speakerlabels": false,
+      "smartformatting": false,
+      "lang": "pt-BR",
+      "langhidden": "",
+      "langcustom": "NoCustomisationSetting",
+      "langcustomhidden": "",
+      "band": "NarrowbandModel",
+      "bandhidden": "NarrowbandModel",
+      "password": "vCxHYSSHfS4Z",
+      "apikey": "",
+      "payload-response": true,
+      "streaming-mode": false,
+      "streaming-mute": false,
+      "auto-connect": false,
+      "discard-listening": false,
+      "disable-precheck": false,
+      "default-endpoint": true,
+      "service-endpoint": "https://stream.watsonplatform.net/speech-to-text/api",
+      "x": 528.0142440795898,
+      "y": 62.00564765930176,
+      "wires": [
+        [
+          "7a04981c.ac8498",
+          "1bf7cfd7.06cee"
+        ]
+      ]
+    },
+    {
+      "id": "db2ea2cf.bc13b",
+      "type": "watson-text-to-speech",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "lang": "pt-BR",
+      "langhidden": "pt-BR",
+      "langcustom": "NoCustomisationSetting",
+      "langcustomhidden": "",
+      "voice": "pt-BR_IsabelaVoice",
+      "voicehidden": "",
+      "format": "audio/mp3",
+      "password": "jlU4eeSZ1nRG",
+      "apikey": "",
+      "payload-response": true,
+      "default-endpoint": true,
+      "service-endpoint": "https://stream.watsonplatform.net/text-to-speech/api",
+      "x": 303.51419830322266,
+      "y": 211.96871662139893,
+      "wires": [
+        [
+          "112c72bd.9948cd"
+        ]
+      ]
+    },
+    {
+      "id": "a4c14b4d.3f3b08",
+      "type": "link out",
+      "z": "822c4617.d515b8",
+      "name": "OutAudio",
+      "links": [
+        "bedddf44.bc241"
+      ],
+      "x": 240.51704025268555,
+      "y": 328.7783579826355,
+      "wires": []
+    },
+    {
+      "id": "957d3dc9.ec01c",
+      "type": "link in",
+      "z": "822c4617.d515b8",
+      "name": "InputTexto",
+      "links": [
+        "7a04981c.ac8498"
+      ],
+      "x": 240.5170440673828,
+      "y": 377.2073745727539,
+      "wires": [
+        [
+          "fe6d3ab6.75e798"
+        ]
+      ]
+    },
+    {
+      "id": "bedddf44.bc241",
+      "type": "link in",
+      "z": "6c3b995c.444e28",
+      "name": "InputAudio",
+      "links": [
+        "a4c14b4d.3f3b08"
+      ],
+      "x": 177.51987266540527,
+      "y": 62.196014404296875,
+      "wires": [
+        [
+          "19b55258.43437e"
+        ]
+      ]
+    },
+    {
+      "id": "19b55258.43437e",
+      "type": "ffmpeg-conversion",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "format": "wav",
+      "audiochannels": "mono",
+      "x": 323.5113830566406,
+      "y": 62.72441864013672,
+      "wires": [
+        [
+          "ef6c6936.466d98"
+        ]
+      ]
+    },
+    {
+      "id": "7a04981c.ac8498",
+      "type": "link out",
+      "z": "6c3b995c.444e28",
+      "name": "OutTexto",
+      "links": [
+        "957d3dc9.ec01c"
+      ],
+      "x": 648.5113344192505,
+      "y": 61.32101821899414,
+      "wires": []
+    },
+    {
+      "id": "d7bd308b.559e9",
+      "type": "change",
+      "z": "822c4617.d515b8",
+      "name": "",
+      "rules": [
+        {
+          "t": "set",
+          "p": "audio",
+          "pt": "global",
+          "to": "true",
+          "tot": "bool"
+        }
+      ],
+      "action": "",
+      "property": "",
+      "from": "",
+      "to": "",
+      "reg": false,
+      "x": 280.5170440673828,
+      "y": 283.1448745727539,
+      "wires": [
+        [
+          "a4c14b4d.3f3b08"
+        ]
+      ]
+    },
+    {
+      "id": "97d6af5f.a773d",
+      "type": "link out",
+      "z": "822c4617.d515b8",
+      "name": "OutTexto",
+      "links": [
+        "304810fc.b531d"
+      ],
+      "x": 610.5198936462402,
+      "y": 394.42043113708496,
+      "wires": []
+    },
+    {
+      "id": "304810fc.b531d",
+      "type": "link in",
+      "z": "6c3b995c.444e28",
+      "name": "InputTexto",
+      "links": [
+        "97d6af5f.a773d"
+      ],
+      "x": 177.51988410949707,
+      "y": 212.20737838745117,
+      "wires": [
+        [
+          "db2ea2cf.bc13b"
+        ]
+      ]
+    },
+    {
+      "id": "f85ab2fc.d0e57",
+      "type": "http in",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "url": "/facebook/resposta",
+      "method": "get",
+      "upload": false,
+      "swaggerDoc": "",
+      "x": 130.0142059326172,
+      "y": 381.00567626953125,
+      "wires": [
+        [
+          "320ac5c8.3185ba"
+        ]
+      ]
+    },
+    {
+      "id": "3ad95e9.dbbf5a2",
+      "type": "http response",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "statusCode": "",
+      "headers": {
+        "content-type": "audio/mpeg3"
+      },
+      "x": 651.0142097473145,
+      "y": 381.4342031478882,
+      "wires": []
+    },
+    {
+      "id": "320ac5c8.3185ba",
+      "type": "change",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "rules": [
+        {
+          "t": "set",
+          "p": "payload",
+          "pt": "msg",
+          "to": "req.query.audioid",
+          "tot": "msg"
+        }
+      ],
+      "action": "",
+      "property": "",
+      "from": "",
+      "to": "",
+      "reg": false,
+      "x": 351.7284698486328,
+      "y": 381.0771017074585,
+      "wires": [
+        [
+          "7663acb0.515cb4"
+        ]
+      ]
+    },
+    {
+      "id": "7663acb0.515cb4",
+      "type": "function",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "func": "for(var k in context.global.speech) {\n  if (context.global.speech[k]._id == msg.payload) \n    {\n      msg.payload = context.global.speech[k].speech;\n// Delete an item\n      context.global.speech.splice(k,1);\n      break;\n    } \n  }\nreturn msg;\n\n//msg.payload = Buffer.from(msg.payload.audio, 'utf8');\n//return msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 515.1332626342773,
+      "y": 381.43421936035156,
+      "wires": [
+        [
+          "3ad95e9.dbbf5a2"
+        ]
+      ]
+    },
+    {
+      "id": "112c72bd.9948cd",
+      "type": "function",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "func": "context.global.idAudio = context.global.idAudio || 0;\ncontext.global.idAudio = Math.floor((Math.random() * 100000000000) + 1);\n\nvar url = \"https://\" + msg.req.headers.host;\n\nif(!context.global.speech)\n{\n    context.global.speech = [];\n    context.global.speech[0] =\n    {_id:context.global.idAudio.toString(),speech:msg.payload};\n}\nelse\n{\n    var pos;\n    pos = context.global.speech.length;\n    context.global.speech[pos] =\n    {_id:context.global.idAudio.toString(),speech:msg.payload};\n}\n\nmsg.payload = [{\"attachment\":{\n    \"type\":\"audio\",\n    \"payload\":{\"url\":url+ \"/facebook/resposta?audioid=\"+context.global.idAudio.toString()}\n    }\n}];\nreturn msg;\n",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 458.01422119140625,
+      "y": 211.00567626953125,
+      "wires": [
+        [
+          "eda9bd69.7a38e"
+        ]
+      ]
+    },
+    {
+      "id": "eda9bd69.7a38e",
+      "type": "link out",
+      "z": "6c3b995c.444e28",
+      "name": "OutAudio",
+      "links": [
+        "6c4a5cb7.ecfd94"
+      ],
+      "x": 586.5170154571533,
+      "y": 210.96304416656494,
+      "wires": []
+    },
+    {
+      "id": "6c4a5cb7.ecfd94",
+      "type": "link in",
+      "z": "822c4617.d515b8",
+      "name": "FaceAudio",
+      "links": [
+        "eda9bd69.7a38e"
+      ],
+      "x": 519.5085296630859,
+      "y": 268.9261245727539,
+      "wires": [
+        [
+          "b6f2e98d.345818"
+        ]
+      ]
+    },
+    {
+      "id": "1bf7cfd7.06cee",
+      "type": "debug",
+      "z": "6c3b995c.444e28",
+      "name": "",
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": false,
+      "complete": "false",
+      "x": 581.5113372802734,
+      "y": 140.06249237060547,
+      "wires": []
+    },
+    {
+      "id": "8210c045.dc1e7",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "Service Instance Details",
+      "connection": "869f960e.370638",
+      "wml-mode": "instanceDetails",
+      "model": "d59e949a-9d16-45bf-8468-23c87b8a2397",
+      "modelhidden": "",
+      "deploymenthidden": "",
+      "x": 355.01422119140625,
+      "y": 71,
+      "wires": [
+        [
+          "ee167985.bb8a48"
+        ]
+      ]
+    },
+    {
+      "id": "43cfbd73.c5f614",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 140.01422119140625,
+      "y": 71,
+      "wires": [
+        [
+          "8210c045.dc1e7"
+        ]
+      ]
+    },
+    {
+      "id": "1fa2052c.5868fb",
+      "type": "debug",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "active": true,
+      "console": "false",
+      "complete": "true",
+      "x": 937.0142211914062,
+      "y": 361,
+      "wires": []
+    },
+    {
+      "id": "ec54cc55.32ae6",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 140.01422119140625,
+      "y": 161,
+      "wires": [
+        [
+          "e4d9782a.e935a8"
+        ]
+      ]
+    },
+    {
+      "id": "e4d9782a.e935a8",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "List Published Models",
+      "connection": "869f960e.370638",
+      "wml-mode": "listModels",
+      "modelhidden": "",
+      "deploymenthidden": "",
+      "x": 352.01422119140625,
+      "y": 161,
+      "wires": [
+        [
+          "a22d07b9.756838"
+        ]
+      ]
+    },
+    {
+      "id": "a8eeb998.9b5a58",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 141.01422119140625,
+      "y": 490,
+      "wires": [
+        [
+          "11a05278.e3befe"
+        ]
+      ]
+    },
+    {
+      "id": "4194776.3d34888",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "Run Prediction",
+      "connection": "869f960e.370638",
+      "wml-mode": "runPrediction",
+      "model": "0c71e666-48d2-4a2d-896e-55ee73f452bd",
+      "deployment": "8188398c-26ca-415f-a8e6-187f678cacad",
+      "modelhidden": "",
+      "deploymenthidden": "",
+      "x": 534.0142211914062,
+      "y": 489,
+      "wires": [
+        [
+          "e604561f.6151d8"
+        ]
+      ]
+    },
+    {
+      "id": "36033e6d.a12592",
+      "type": "link in",
+      "z": "961a4b11.d12758",
+      "name": "wml out",
+      "links": [
+        "ee167985.bb8a48",
+        "a22d07b9.756838",
+        "e604561f.6151d8",
+        "dc7053a7.89648",
+        "c6b93808.a167d8",
+        "2eedde6d.90df32",
+        "8390ede5.cc483",
+        "10391ba5.378ec4",
+        "ab1bd756.273ae8",
+        "4594cf91.8a049"
+      ],
+      "x": 782.0142211914062,
+      "y": 360,
+      "wires": [
+        [
+          "1fa2052c.5868fb"
+        ]
+      ]
+    },
+    {
+      "id": "ee167985.bb8a48",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 518.0142211914062,
+      "y": 71,
+      "wires": []
+    },
+    {
+      "id": "a22d07b9.756838",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 526.0142211914062,
+      "y": 161,
+      "wires": []
+    },
+    {
+      "id": "e604561f.6151d8",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 657.0142211914062,
+      "y": 489,
+      "wires": []
+    },
+    {
+      "id": "74c6e515.3129ac",
+      "type": "comment",
+      "z": "961a4b11.d12758",
+      "name": "Instance Method",
+      "info": "",
+      "x": 134.01422119140625,
+      "y": 33,
+      "wires": []
+    },
+    {
+      "id": "5fa73d9d.0aae64",
+      "type": "comment",
+      "z": "961a4b11.d12758",
+      "name": "Published Model Methods",
+      "info": "",
+      "x": 165.01422119140625,
+      "y": 119,
+      "wires": []
+    },
+    {
+      "id": "da546da6.1d036",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 142.01422119140625,
+      "y": 197,
+      "wires": [
+        [
+          "eea32e9b.66287"
+        ]
+      ]
+    },
+    {
+      "id": "eea32e9b.66287",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "Get Model Details",
+      "connection": "869f960e.370638",
+      "wml-mode": "getModelDetails",
+      "model": "d8308d26-e143-41f3-a44c-7808a890e7bb",
+      "modelhidden": "",
+      "deploymenthidden": "",
+      "x": 341.01422119140625,
+      "y": 197,
+      "wires": [
+        [
+          "dc7053a7.89648"
+        ]
+      ]
+    },
+    {
+      "id": "dc7053a7.89648",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 526.0142211914062,
+      "y": 197,
+      "wires": []
+    },
+    {
+      "id": "e61195ac.f5ce38",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 143.01422119140625,
+      "y": 234,
+      "wires": [
+        [
+          "a8825640.6f2f28"
+        ]
+      ]
+    },
+    {
+      "id": "a8825640.6f2f28",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "List Model Metrics",
+      "connection": "869f960e.370638",
+      "wml-mode": "listModelMetrics",
+      "model": "d8308d26-e143-41f3-a44c-7808a890e7bb",
+      "x": 340.01422119140625,
+      "y": 234,
+      "wires": [
+        [
+          "c6b93808.a167d8"
+        ]
+      ]
+    },
+    {
+      "id": "c6b93808.a167d8",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 525.0142211914062,
+      "y": 234,
+      "wires": []
+    },
+    {
+      "id": "f60fa177.d1807",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 142.01422119140625,
+      "y": 270,
+      "wires": [
+        [
+          "db4fa75b.e8a378"
+        ]
+      ]
+    },
+    {
+      "id": "db4fa75b.e8a378",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "List Model Iterations",
+      "connection": "869f960e.370638",
+      "wml-mode": "listLearningIterations",
+      "model": "d8308d26-e143-41f3-a44c-7808a890e7bb",
+      "x": 348.01422119140625,
+      "y": 270,
+      "wires": [
+        [
+          "2eedde6d.90df32"
+        ]
+      ]
+    },
+    {
+      "id": "2eedde6d.90df32",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 525.0142211914062,
+      "y": 270,
+      "wires": []
+    },
+    {
+      "id": "5f0d6020.0ef75",
+      "type": "comment",
+      "z": "961a4b11.d12758",
+      "name": "Model Deployment Methods",
+      "info": "",
+      "x": 177.01422119140625,
+      "y": 315,
+      "wires": []
+    },
+    {
+      "id": "b70dcb6f.1afba8",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "List Model Deployments",
+      "connection": "869f960e.370638",
+      "wml-mode": "listModelDeployments",
+      "model": "d8308d26-e143-41f3-a44c-7808a890e7bb",
+      "modelhidden": "",
+      "deploymenthidden": "",
+      "x": 361.01422119140625,
+      "y": 358,
+      "wires": [
+        [
+          "8390ede5.cc483"
+        ]
+      ]
+    },
+    {
+      "id": "508ce02d.87066",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 142.01422119140625,
+      "y": 358,
+      "wires": [
+        [
+          "b70dcb6f.1afba8"
+        ]
+      ]
+    },
+    {
+      "id": "8390ede5.cc483",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 529.0142211914062,
+      "y": 358,
+      "wires": []
+    },
+    {
+      "id": "83148f54.2a084",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 142.01422119140625,
+      "y": 397,
+      "wires": [
+        [
+          "7a3e8f02.2d9c8"
+        ]
+      ]
+    },
+    {
+      "id": "7a3e8f02.2d9c8",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "Get Deployment Details",
+      "connection": "869f960e.370638",
+      "wml-mode": "getDeploymentDetails",
+      "model": "d8308d26-e143-41f3-a44c-7808a890e7bb",
+      "deployment": "6d653718-085d-41b9-bcf2-b70fbe1ce4c1",
+      "x": 358.01422119140625,
+      "y": 397,
+      "wires": [
+        [
+          "10391ba5.378ec4"
+        ]
+      ]
+    },
+    {
+      "id": "10391ba5.378ec4",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 528.0142211914062,
+      "y": 397,
+      "wires": []
+    },
+    {
+      "id": "6649efa3.8bf4d",
+      "type": "comment",
+      "z": "961a4b11.d12758",
+      "name": "Scoring - Prediction",
+      "info": "",
+      "x": 149.01422119140625,
+      "y": 444,
+      "wires": []
+    },
+    {
+      "id": "11a05278.e3befe",
+      "type": "function",
+      "z": "961a4b11.d12758",
+      "name": "Build Payload Values",
+      "func": "msg.payload = [[16.4, 48.3, 30, 75.4, 28.9, 20]];\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 327.01422119140625,
+      "y": 490,
+      "wires": [
+        [
+          "4194776.3d34888"
+        ]
+      ]
+    },
+    {
+      "id": "6f8695b1.3ca63c",
+      "type": "comment",
+      "z": "961a4b11.d12758",
+      "name": "Delete",
+      "info": "",
+      "x": 107.51422119140625,
+      "y": 543,
+      "wires": []
+    },
+    {
+      "id": "f91ef8d4.a18d88",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 141.01422119140625,
+      "y": 585,
+      "wires": [
+        [
+          "a4084afd.5172d8"
+        ]
+      ]
+    },
+    {
+      "id": "1c78dce0.8e3233",
+      "type": "inject",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "x": 141.01422119140625,
+      "y": 624,
+      "wires": [
+        [
+          "b40f4233.618cc"
+        ]
+      ]
+    },
+    {
+      "id": "a4084afd.5172d8",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "Delete Model",
+      "connection": "869f960e.370638",
+      "wml-mode": "deleteModel",
+      "model": "",
+      "deployment": "",
+      "modelhidden": "",
+      "deploymenthidden": "",
+      "x": 302.51422119140625,
+      "y": 585,
+      "wires": [
+        [
+          "ab1bd756.273ae8"
+        ]
+      ]
+    },
+    {
+      "id": "b40f4233.618cc",
+      "type": "wml",
+      "z": "961a4b11.d12758",
+      "name": "Delete Model Deployment",
+      "connection": "869f960e.370638",
+      "wml-mode": "deleteDeployment",
+      "model": "",
+      "deployment": "",
+      "modelhidden": "",
+      "deploymenthidden": "",
+      "x": 343.51422119140625,
+      "y": 624,
+      "wires": [
+        [
+          "4594cf91.8a049"
+        ]
+      ]
+    },
+    {
+      "id": "ab1bd756.273ae8",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 523.5142211914062,
+      "y": 584,
+      "wires": []
+    },
+    {
+      "id": "4594cf91.8a049",
+      "type": "link out",
+      "z": "961a4b11.d12758",
+      "name": "",
+      "links": [
+        "36033e6d.a12592"
+      ],
+      "x": 526.5142211914062,
+      "y": 624,
+      "wires": []
+    }
+  ]
